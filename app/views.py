@@ -12,6 +12,8 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import action
+from django.core.mail import send_mail
+
 
 
 # Register 
@@ -54,3 +56,47 @@ class Login(APIView):
         response.data = {'token': token, 'email': user.email, 'name': user.name, 'date_joined': payload['date_joined'], 'id': payload['id']}
         
         return response
+
+
+
+
+# Forgot password
+@api_view(['POST'])
+def forgotPassword(request):
+    try:
+        email = request.data.get('email')
+        print(f"Email received: {email}")
+        verify = User.objects.filter(email=email).first()
+        if verify:
+            link = f"http://localhost:3000/resetpassword/{verify.id}"
+            print(f"Reset link: {link}")
+            send_mail(
+                subject='Reset your password',
+                message=f'We have received a request to reset the password associated with your account on our E-learning platform. To proceed with resetting your password, please click the link below:{link}',
+                from_email='Moroccan Blog',
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            return Response({'message': 'Forgot password success'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Reset password failed'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"Error: {e}")
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# reset password
+@api_view(['POST'])
+def resetpassword(request, user_id):
+    try:
+        password = request.data.get('password')
+        verify = User.objects.filter(id=user_id).first()
+        if verify:
+            hashed_password = make_password(password)
+            User.objects.filter(id=user_id).update(password=hashed_password)
+            return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': "Password didn't change"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(f"Error: {e}")
+        return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
