@@ -72,7 +72,7 @@ def forgotPassword(request):
             print(f"Reset link: {link}")
             send_mail(
                 subject='Reset your password',
-                message=f'We have received a request to reset the password associated with your account on our E-learning platform. To proceed with resetting your password, please click the link below:{link}',
+                message=f'We have received a request to reset the password associated with your account on our website. To proceed with resetting your password, please click the link below:{link}',
                 from_email='Moroccan Blog',
                 recipient_list=[email],
                 fail_silently=False,
