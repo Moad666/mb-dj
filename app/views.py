@@ -90,6 +90,7 @@ def forgotPassword(request):
 def resetpassword(request, user_id):
     try:
         password = request.data.get('password')
+        # check if the user exist in db
         verify = User.objects.filter(id=user_id).first()
         if verify:
             hashed_password = make_password(password)
