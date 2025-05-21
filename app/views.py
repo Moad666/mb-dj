@@ -13,6 +13,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 from rest_framework.decorators import action
 from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
+
 
 
 
@@ -101,3 +105,5 @@ def resetpassword(request, user_id):
     except Exception as e:
         print(f"Error: {e}")
         return Response({'error': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
